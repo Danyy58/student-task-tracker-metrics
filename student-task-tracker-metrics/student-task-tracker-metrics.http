@@ -1,0 +1,6 @@
+@student_task_tracker_metrics_HostAddress = http://localhost:5037
+
+GET {{student_task_tracker_metrics_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

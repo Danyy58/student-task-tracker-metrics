@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="student-task-tracker-metrics/student-task-tracker-metrics.csproj" />
+  <Project Path="task-service/task-service.csproj" />
+</Solution>
