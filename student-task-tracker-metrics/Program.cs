@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Prometheus;
+using System.Text;
 using UserService.Data;
 using UserService.Repository;
 using UserService.Repository.Token;
 using UserService.Services;
 using UserService.Services.Token;
-using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +25,31 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["AppSettings:Audience"],
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),
+            ValidateIssuerSigningKey = true
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies["user-cookie"];
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+
 var app = builder.Build();
 
 app.UseCookiePolicy(new CookiePolicyOptions
@@ -37,8 +65,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-// ------------ ДОБАВЬТЕ ЭТОТ БЛОК КОДА ------------
-// Автоматическое применение миграций при старте
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -52,13 +78,10 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        // Можно добавить логирование, если что-то пошло не так
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
-// ---------------------------------------------------
-
 
 app.UseHttpsRedirection();
 

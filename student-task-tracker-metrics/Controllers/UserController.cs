@@ -88,7 +88,7 @@ namespace UserService.Controllers
 
         private int GetUser()
         {
-            return Convert.ToInt32(HttpContext.Request.Headers["X-User-Id"].FirstOrDefault());
+            return Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
     }
 }

@@ -53,28 +53,20 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-// ------------ ДОБАВЬТЕ ЭТОТ БЛОК КОДА ------------
-// Автоматическое применение миграций при старте
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        // Получаем контекст базы данных
         var dbContext = services.GetRequiredService<AppDbContext>();
-
-        // Применяем все ожидающие миграции
         dbContext.Database.Migrate();
     }
     catch (Exception ex)
     {
-        // Можно добавить логирование, если что-то пошло не так
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
-// ---------------------------------------------------
-
 
 app.UseHttpsRedirection();
 

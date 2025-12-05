@@ -1,4 +1,7 @@
 <Solution>
+  <Project Path="../graphql-test-2/graphql-book-service/graphql-test-2.csproj" />
+  <Project Path="../nginx-test-app/nginx-test-app/nginx-test-app.csproj" />
+  <Project Path="../nginx-test-app/nginx-test-second-app/nginx-test-second-app.csproj" />
   <Project Path="student-task-tracker-metrics/student-task-tracker-metrics.csproj" />
   <Project Path="task-service/task-service.csproj" />
 </Solution>
